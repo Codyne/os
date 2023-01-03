@@ -1,3 +1,4 @@
 *.o
 os.bin
+os.iso
 isodir/
