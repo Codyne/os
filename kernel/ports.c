@@ -1,5 +1,4 @@
-#include "keyboard.h"
-#include "std_types.h"
+#include "ports.h"
 
 uint8_t inb(uint16_t port) {
 	uint8_t in;

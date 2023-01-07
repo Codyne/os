@@ -1,4 +1,5 @@
 #include "std_types.h"
+#include "keyboard.h"
 #include "vga.h"
 
 void kernel_entry() {

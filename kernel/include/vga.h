@@ -6,6 +6,9 @@
 #define VGA_ADDR 0xB8000
 #define BUFF_SIZE 2200
 
+#define REG_SCREEN_CTRL 0x3d4
+#define REG_SCREEN_DATA 0x3d5
+
 enum vga_color {
 	BLACK,
 	BLUE,

@@ -1,4 +1,9 @@
 #include "vga.h"
+#include "mem.h"
+#include "ports.h"
+
+#define TERM_COLS 80
+#define TERM_ROWS 20
 
 uint16_t *vga_buffer;
 uint32_t vga_idx;
@@ -25,27 +30,32 @@ void clear_vga_buffer(uint16_t **buff, uint8_t fg_color, uint8_t bg_color) {
 }
 
 uint16_t vga_entry(uint8_t ch, uint8_t fg_color, uint8_t bg_color) {
-	uint16_t ax = 0;
-	uint8_t ah = 0, al = 0;
+	return (((bg_color << 4) | fg_color) << 8) | ch;
+}
 
-	ah = bg_color;
-	ah <<= 4;
-	ah |= fg_color;
-	ax = ah;
-	ax <<= 8;
-	al = ch;
-	ax |= al;
+void scroll_term() {
+	vga_line = TERM_ROWS - 1;
+	memcpy((uint8_t *)vga_buffer, (uint8_t *)(vga_buffer + TERM_COLS),
+		   TERM_COLS * (TERM_ROWS - 1) * 2);
+	memset((uint8_t *)(vga_buffer + (TERM_COLS * (TERM_ROWS - 1))),
+		   0, TERM_COLS * 2);
+}
 
-	return ax;
+void cur_next_line() {
+	if (++vga_line >= TERM_ROWS)
+		scroll_term();
+	vga_idx = vga_line * TERM_COLS;
 }
 
 void print_ch(uint8_t ch) {
 	if (ch == '\n') {
-		vga_line++;
-		vga_idx = vga_line * 80;
+		cur_next_line();
 	} else {
 		vga_buffer[vga_idx] = vga_entry(ch, fg_c, bg_c);
 		vga_idx++;
+
+		if (vga_idx && !(vga_idx % TERM_COLS))
+			cur_next_line();
 	}
 }
 
